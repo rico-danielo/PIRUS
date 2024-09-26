@@ -4,15 +4,13 @@ FONCTION initialisation
 
 
 
-
 DÉBUT
 Lire les capteurs de proximité gauche
 SI les deux capteurs ne captent pas un obstacle ALORS
 Tourne à gauche
 Avancer de 1m
 PosY := PosY+1
-SINON 
-SI les capteurs de proximité d'avant captent un obstacle ALORS
+SINON SI les capteurs de proximité d'avant captent un obstacle ALORS
 Recule 
 PosX:=PosX-1
 Tourne à gauche
