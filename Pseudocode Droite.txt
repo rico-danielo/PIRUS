@@ -1,0 +1,37 @@
+Fonction pour le robot pour la prise de decision a droite
+
+	//PosX(entier): Position en x
+	// PosY(entier): Position en y
+
+	Debut
+		Lire les capteurs en avant et a gauche
+		si les capteurs detectent un obstacle
+			Tourner a droite
+			Avancer
+			PosX = PosX + 1    //posX = 2
+			Tourner a gauche
+			Avancer
+			PosY = PosY + 1 // posY = 1
+		sinon
+			si le capteur avant ne capte pas d ' obstacle et celui de gauche capte obstacle
+				avance		
+				PosY = PosY + 1    //posY = 1
+			sinon
+				toune a gauche
+				avance
+				posX = Pox - 1   //posX = 0
+				Tourne a droite
+				check en avant
+				si le capteur avant detecte un obstacle 
+					tourner a droite
+					avancer
+					posx = posx + 1 //posx = 2
+					tourner a gauche
+					avancer
+					posY = posY + 1 
+				sinon
+					avancer
+					posy = posy + 1
+				finsi
+		finsi
+	FIN
