@@ -1,0 +1,26 @@
+FONCTION LoopPositionGauche()
+//PosX(entier):position en X du robot
+//PosY(entier):position en Y du robot
+
+
+DÉBUT
+Lire les capteurs avants
+SI les capteurs ne détectent pas un obstacle ALORS
+avance
+PosY:= PosY +1
+SINON
+tourne à droite
+avance
+PosX:=PosX+1
+Lire les capteurs gauches
+SI les capteurs ne détectent pas un obastacle ALORS
+tourne à gauche
+avance
+PosY:=PosY+1
+SINON
+avance
+PosX:=PosX+1;
+tourne à gauche
+avance
+PosY:=PosY+1;
+FIN
