@@ -1,5 +1,10 @@
 #include <Arduino.h>
 #include <libRobux.h>
+#define GaucheVertPin = 1;
+#define GaucheRougePin = 2;
+#define AvantVertPin = 3;
+#define AvantRougePin = 4;
+
 
 // put function declarations here:
 bool GaucheVert;
@@ -8,12 +13,6 @@ bool AvantVert;
 bool AvantRouge;
 bool DroiteVert;
 bool DroiteRouge;
-int GaucheVertPin = 1;
-int GaucheRougePin = 2;
-int AvantVertPin = 3;
-int AvantRougePin = 4;
-int DroiteVertPin = 5;
-int DroiteRougePin = 6;
 int PosX = 1;
 int PosY = 0;
 
@@ -31,9 +30,7 @@ void avanceY(){
 void avanceX(){
   MOTOR_SetSpeed(RIGHT,vitesse);
   MOTOR_SetSpeed(LEFT, vitesse);
-  
 }
-
 
 void tourneDroit(){
   MOTOR_SetSpeed(RIGHT, -0.5*vitesse);
