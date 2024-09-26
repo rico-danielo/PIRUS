@@ -1,0 +1,26 @@
+FONCTION LoopPositionMillieu
+//PosX(entier):position en X du robot
+//PosY(entier):position en Y du robot
+
+
+
+DÉBUT
+Lire les capteurs de proximité avant
+SI les deux capteurs ne captent pas un obstacle ALORS
+Avancer
+PosY := PosY+1
+SINON SI les capteurs de proximité de gauche ne captent pas un obstacle ALORS
+tourne a gauche
+avance
+tourne a droite
+avance
+PosX:=PosX-1
+PosY:=PosY+1
+SINON
+tourne à droite
+avance
+PosX:=PosX+1
+Tourner à gauche
+Avancer
+PosY:=PosY+1
+FIN
