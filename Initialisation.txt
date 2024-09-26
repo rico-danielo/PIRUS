@@ -1,0 +1,27 @@
+FONCTION initialisation
+//PosX(entier):position en X
+//PosY(entier):position en Y
+
+
+
+
+DÉBUT
+Lire les capteurs de proximité gauche
+SI les deux capteurs ne captent pas un obstacle ALORS
+Tourne à gauche
+Avancer de 1m
+PosY := PosY+1
+SINON 
+SI les capteurs de proximité d'avant captent un obstacle ALORS
+Recule 
+PosX:=PosX-1
+Tourne à gauche
+Avance
+PosY:=PosY+1
+SINON
+Avancer
+PosX:=PosX+1
+Tourner à gauche
+Avancer
+PosY:=PosY+1
+FIN
