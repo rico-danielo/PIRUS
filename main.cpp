@@ -58,7 +58,7 @@ void tourneGauche(){
 //Fonction permettant de lire les capteurs gauche
 //Retourne 1 si un obstacle est détecté
 //Retourne 0 si rien n'est détecté
-void CheckGauche(){
+int CheckGauche(){
   GaucheRouge = digitalRead(GaucheRougePin);
   GaucheVert = digitalRead(GaucheVertPin); 
 if (GaucheVert && GaucheRouge)
@@ -71,7 +71,7 @@ return 1;
 //Fonction permettant de lire les capteurs droite
 //Retourne 1 si un obstacle est détecté
 //Retourne 0 si rien n'est détecté
-void CheckAvant(){
+int CheckAvant(){
   AvantRouge = digitalRead(AvantRougePin);
   AvantVert = digitalRead(AvantVertPin);
   if (AvantRouge && AvantVert)
