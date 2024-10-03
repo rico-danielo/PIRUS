@@ -15,7 +15,7 @@ bool GaucheRouge;
 bool AvantVert;
 bool AvantRouge;
 bool depart;
-int BufferSon = 0;
+int BufferSon = 20;
 int PosX = 1;
 int PosY = 0;
 float vitesse;
@@ -233,6 +233,10 @@ void retour()
 
 //initialisation des Pins
 void setup() {
+  BoardInit();
+  AX_BuzzerON();
+  delay(100);
+  AX_BuzzerOFF();
   MOTOR_SetSpeed(LEFT, 0);
   MOTOR_SetSpeed(RIGHT, 0);
   pinMode(AvantVertPin, INPUT);
@@ -241,6 +245,7 @@ void setup() {
   pinMode(GaucheRougePin, INPUT);
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
+
 }
 
 
@@ -249,6 +254,7 @@ void loop()
   CapteurAmbiant = analogRead(CapteurAmbiantPin);
   Serial.print("Ambiant");
   Serial.println(CapteurAmbiant);
+
   CapteurSon = analogRead(CapteurSonPin);
   Serial.print("CapteurSon");
   Serial.println(CapteurSon);
@@ -259,30 +265,30 @@ void loop()
    Serial.println("true");
   }
 
-/*
+
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
   while (PosY<5 && depart)
   {
-  switch (PosX)
+    switch (PosX)
 
-  {
-  case 0:
+    {
+    case 0:
       PosRetour[PosY]=0;
-     Gauche();
+      Gauche();
     break;
 
-  case 1: 
+    case 1: 
      PosRetour[PosY]=1;
      Milieu();
-  break;
+    break;
 
-  case 2:
-    PosRetour[PosY]=2;
-    Droite();
-  break;
+    case 2:
+      PosRetour[PosY]=2;
+      Droite();
+    break;
 
-  default:
-  break;
+    default:
+    break;
   }
 
   //Le robot arrête après avoir traversé la ligne de fin
@@ -290,5 +296,5 @@ void loop()
   arret();
 
   retour();
-*/
+
 }
