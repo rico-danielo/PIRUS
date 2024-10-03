@@ -1,11 +1,13 @@
 #include <Arduino.h>
-#include <libRobux.h>
+#include <libRobus.h>
 
 //Définition des variables et des constantes
-#define GaucheVertPin = 1;
-#define GaucheRougePin = 2;
-#define AvantVertPin = 3;
-#define AvantRougePin = 4;
+#define GaucheVertPin 2
+#define GaucheRougePin 3
+#define AvantVertPin 4
+#define AvantRougePin 5
+#define CapteurSonPin (A3)
+#define CapteurAmbiantPin 8
 
 
 bool GaucheVert;
@@ -13,10 +15,13 @@ bool GaucheRouge;
 bool AvantVert;
 bool AvantRouge;
 bool depart;
+int BufferSon = 0;
 int PosX = 1;
 int PosY = 0;
 float vitesse;
-char PosRetour[];
+float CapteurAmbiant;
+float CapteurSon;
+char PosRetour[10];
 
 //Fonction d'arrêt des moteurs
 void arret(){
@@ -61,11 +66,11 @@ void tourneGauche(){
 int CheckGauche(){
   GaucheRouge = digitalRead(GaucheRougePin);
   GaucheVert = digitalRead(GaucheVertPin); 
-if (GaucheVert && GaucheRouge)
-{
-  return 0;
-}
-return 1;
+  if (GaucheVert && GaucheRouge)
+  {
+   return 0;
+  }
+  return 1;
 }
 
 //Fonction permettant de lire les capteurs droite
@@ -87,7 +92,7 @@ int CheckAvant(){
 //Incrémente automatiquement la position de Y à la fin 
 void Gauche()
 {
-if (CheckAvant() = 0)
+if (CheckAvant() == 0)
   {
     avanceY();
       PosY++;
@@ -97,7 +102,7 @@ else
     tourneDroit();
     avanceX();
     PosX++;
-    if (CheckGauche = 0)
+    if (CheckGauche == 0)
     {
       tourneGauche();
       avanceY();
@@ -121,14 +126,14 @@ else
 //Incrémente automatiquement la position de Y à la fin
 void Milieu()
 {
-  if (CheckAvant() = 0)
+  if (CheckAvant() == 0)
   {
     avanceY();
     PosY++;
   }
   else
   {
-    if (CheckGauche() = 0)
+    if (CheckGauche() == 0)
     {
       tourneGauche();
       avanceX();
@@ -152,7 +157,7 @@ void Milieu()
 //Uniquement pour l'allée
 //Incrémente automatiquement la position de Y à la fin
 void Droite(){
-  if (CheckAvant() = 0)
+  if (CheckAvant() == 0)
   {
     avanceY();
     PosY++;
@@ -162,7 +167,7 @@ void Droite(){
     tourneGauche();
     avanceX();
     PosX--;
-    if (CheckAvant() = 1)
+    if (CheckAvant() == 1)
     {
       tourneDroit();
       avanceY();
@@ -194,7 +199,7 @@ void retour()
       avanceX();
       if (PosRetour[PosY-1]<PosX)
       {
-       avanceX()
+       avanceX();
      }
      tourneGauche();
    }
@@ -228,34 +233,45 @@ void retour()
 
 //initialisation des Pins
 void setup() {
+  MOTOR_SetSpeed(LEFT, 0);
+  MOTOR_SetSpeed(RIGHT, 0);
   pinMode(AvantVertPin, INPUT);
   pinMode(AvantRougePin, INPUT);
   pinMode(GaucheVertPin, INPUT);
   pinMode(GaucheRougePin, INPUT);
+  pinMode(CapteurAmbiantPin, INPUT);
+  pinMode(CapteurSonPin, INPUT);
 }
 
 
-void loop(){
-
-//Boucle déclarant le départ à partir du sifflet
-if (/* condition */)
+void loop()
 {
-  depart = true;
-}
+  CapteurAmbiant = analogRead(CapteurAmbiantPin);
+  Serial.print("Ambiant");
+  Serial.println(CapteurAmbiant);
+  CapteurSon = analogRead(CapteurSonPin);
+  Serial.print("CapteurSon");
+  Serial.println(CapteurSon);
+  //Boucle déclarant le départ à partir du sifflet
+  if ((CapteurAmbiant + BufferSon) < CapteurSon)
+  {
+   depart = true;
+   Serial.println("true");
+  }
 
+/*
+  //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
+  while (PosY<5 && depart)
+  {
+  switch (PosX)
 
-//Boucle déclarant chaque cas possible selon la position du robot pour l'allée
-while (PosY<5 && depart)
-{
- switch (PosX)
+  {
+  case 0:
+      PosRetour[PosY]=0;
+     Gauche();
+    break;
 
-{
-case 0:
-    PosRetour[PosY]=0;
-    Gauche();
-  break;
-
-case 1:
+  case 1: 
      PosRetour[PosY]=1;
      Milieu();
   break;
@@ -265,13 +281,14 @@ case 1:
     Droite();
   break;
 
-default:
+  default:
   break;
-}
+  }
 
-//Le robot arrête après avoir traversé la ligne de fin
-}
-arret();
+  //Le robot arrête après avoir traversé la ligne de fin
+  }
+  arret();
 
-retour();
+  retour();
+*/
 }
