@@ -8,17 +8,26 @@
 #define AvantRougePin 5
 #define CapteurSonPin (A3)
 #define CapteurAmbiantPin 8
+#define X 45
+#define Y 95
 
+#define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
+#define ENCODERFULLTURN 3200
+#define STARTRATION 1.0325
+int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
+int etatPast = 0;
+float vitesse = 0.40;
+float vitesse2 = 0.4;
 
 bool GaucheVert;
 bool GaucheRouge;
 bool AvantVert;
 bool AvantRouge;
 bool depart;
-int BufferSon = 20;
+bool fin = false;
+int BufferSon = 50;
 int PosX = 1;
 int PosY = 0;
-float vitesse;
 float CapteurAmbiant;
 float CapteurSon;
 char PosRetour[10];
@@ -30,33 +39,138 @@ void arret(){
 };
 
 
-//Fonction d'avancer (plus longue distance que avanceX)
-//Ajoute aussi 1 à la position en Y à chaque utilisation
-//À utiliser seulement lors de déplacement dans l'axe des Y(5m)
-void avanceY(){
-  MOTOR_SetSpeed(RIGHT,vitesse);
-  MOTOR_SetSpeed(LEFT, vitesse);
-};
-
-//Fonction d'avancer (plus petite distance que avanceY)
-//Ne change pas la position en X dans cette fonction
-void avanceX(){
-  MOTOR_SetSpeed(RIGHT,vitesse);
-  MOTOR_SetSpeed(LEFT, vitesse);
-}
-
-
 //Fonction permettant une rotation de 90 degrés vers la droite
-void tourneDroit(){
-  MOTOR_SetSpeed(RIGHT, -0.5*vitesse);
-  MOTOR_SetSpeed(LEFT, 0.5*vitesse);
+void tourneDroit(int time){
+  Serial.print("Tourner 3 tours");
+  MOTOR_SetSpeed(RIGHT, -0.5*vitesse2);
+  MOTOR_SetSpeed(LEFT, 0.5*vitesse2);
+  delay(time);
+  MOTOR_SetSpeed(RIGHT, 0 );
+  MOTOR_SetSpeed(LEFT, 0 );
+  Serial.println("fin des 3 tours");
+};
+
+void tourneGauche(int time){
+  Serial.print("Tourner 1/2 tours");
+  MOTOR_SetSpeed(RIGHT, 0.5*vitesse2);
+  MOTOR_SetSpeed(LEFT, -0.5*vitesse2);
+  delay(time);//28560
+  
+  MOTOR_SetSpeed(RIGHT, 0 );
+  MOTOR_SetSpeed(LEFT, 0 );
+  Serial.println("fin des 1/2 tours");
+};
+void ClearEncoders(void){
+  ENCODER_Reset(RIGHT);
+  ENCODER_Reset(LEFT);
+};
+
+void EncoderInit(void){
+  ClearEncoders();
+};
+
+void Accelerate(float VitesseRecherche)
+{
+  int i = 1;
+  for(; i<=10 ; i++)
+  {
+    
+    static float pourcentageLM = VitesseRecherche/(10);
+    static float pourcentageRM= (VitesseRecherche*STARTRATION)/(10);
+    float LMSpeed = pourcentageLM*i;
+    float RMSpeed = pourcentageRM*i;
+    if(LMSpeed >= 0.15)
+    {
+    MOTOR_SetSpeed(RIGHT,RMSpeed);
+    MOTOR_SetSpeed(LEFT,LMSpeed);
+    /*int32_t leftPID = ENCODER_Read(LEFT);
+    int32_t rightPID = ENCODER_Read(RIGHT);
+    PidLArray[i] = leftPID;
+    PidRArray[i] = rightPID;*/
+    delay(100);
+    }
+  }
+}
+void DecelerateToAStop(float VitesseRecherche)
+{
+  for(int i=10;i>=1;i--)
+  {
+    static float pourcentageLM = VitesseRecherche/(10);
+    static float pourcentageRM= (VitesseRecherche*STARTRATION)/(10);
+    float LMSpeed = pourcentageLM*i;
+    float RMSpeed = pourcentageRM*i;
+    if(LMSpeed >= 0.15)
+    {
+    MOTOR_SetSpeed(RIGHT,RMSpeed);
+    MOTOR_SetSpeed(LEFT,LMSpeed);
+    delay(100);
+    }
+  }
+
+    MOTOR_SetSpeed(RIGHT,0);
+    MOTOR_SetSpeed(LEFT,0);
+    ENCODER_Reset(LEFT);
+    ENCODER_Reset(RIGHT);
 };
 
 
-//Fonction permettant une rotation de 90 degrés vers la gauche
-void tourneGauche(){
-  MOTOR_SetSpeed(RIGHT, 0.5*vitesse);
-  MOTOR_SetSpeed(LEFT, -0.5*vitesse);
+void avance(int Distance, double MotorSpeed){
+Serial.print("avance2");
+    ClearEncoders();
+  //Read encoder value for both motor (Value readout should be 0)
+    float Rspeed = MotorSpeed*STARTRATION;
+    float Lspeed = MotorSpeed;
+    int32_t leftPID = ENCODER_Read(LEFT);
+    int32_t rightPID = ENCODER_Read(RIGHT);
+
+    float GoalDist = 95*(3200/WHEELCIRC);//140416 for 45cm
+MOTOR_SetSpeed(LEFT,vitesse);
+MOTOR_SetSpeed(RIGHT,vitesse);
+    //Accelerate(MotorSpeed);
+    
+Serial.print("avance3");
+    while(GoalDist > ((leftPID+rightPID)/2) )
+    {
+      //i++;  //Pour voir les valeurs lue des encodeurs à chaque changement.
+      delay(50);
+      leftPID = ENCODER_Read(LEFT);
+      rightPID = ENCODER_Read(RIGHT);
+      if(leftPID > (rightPID+5) || leftPID >(rightPID-5))//Do this comparison first since left motor is slower at the same power percentage
+      {
+        Serial.print("avance31");
+        Rspeed+=((leftPID-rightPID)*0.000008);
+        Lspeed-=((leftPID-rightPID)*0.000004);
+        MOTOR_SetSpeed(RIGHT,Rspeed);
+        MOTOR_SetSpeed(LEFT,Lspeed);
+        
+      }
+      else if(leftPID < rightPID+5 || leftPID < (rightPID-5))
+      {
+        Serial.print("avance32");
+        Lspeed+=((rightPID-leftPID)*0.000008);   
+        Rspeed-=((rightPID-leftPID)*0.000004);
+        MOTOR_SetSpeed(LEFT,Lspeed);
+        MOTOR_SetSpeed(RIGHT,Rspeed);
+        
+      }
+      else if((leftPID && rightPID) == 0)
+      {
+        Serial.print("avance33");
+        MOTOR_SetSpeed(RIGHT,Rspeed);
+        MOTOR_SetSpeed(LEFT,Lspeed);
+        
+      }
+
+      /*PidLArray[i] = leftPID;//Pour voir les valeurs lue des encodeurs à chaque changement.
+      PidRArray[i] = rightPID;
+      SpeedLArray[i] = Rspeed;
+      SpeedRArray[i] = Lspeed;*/
+    }
+Serial.print("avance4");
+    DecelerateToAStop(MotorSpeed);
+    leftPID = ENCODER_Read(LEFT);
+    rightPID = ENCODER_Read(RIGHT);
+    delay(500);
 };
 
 
@@ -94,26 +208,26 @@ void Gauche()
 {
 if (CheckAvant() == 0)
   {
-    avanceY();
+    avance(Y,vitesse);
       PosY++;
   }
 else
   {
-    tourneDroit();
-    avanceX();
+    tourneDroit(939);
+    avance(X,vitesse);
     PosX++;
     if (CheckGauche == 0)
     {
-      tourneGauche();
-      avanceY();
+      tourneGauche(939);
+      avance(Y,vitesse);
       PosY++;
     }
     else
     {
-      avanceX();
+      avance(X,vitesse);
       PosX++;
-      tourneGauche();
-      avanceY();
+      tourneGauche(939);
+      avance(Y,vitesse);
       PosY++;
     }
   }
@@ -128,25 +242,25 @@ void Milieu()
 {
   if (CheckAvant() == 0)
   {
-    avanceY();
+    avance(Y,vitesse);
     PosY++;
   }
   else
   {
     if (CheckGauche() == 0)
     {
-      tourneGauche();
-      avanceX();
+      tourneGauche(939);
+      avance(X,vitesse);
       PosX--;
-      tourneDroit();
-      avanceY();
+      tourneDroit(939);
+      avance(Y,vitesse);
       PosY++;
     }
-    tourneDroit();
-    avanceX();
+    tourneDroit(939);
+    avance(X,vitesse);
     PosX++;
-    tourneGauche();
-    avanceY();
+    tourneGauche(939);
+    avance(Y,vitesse);
     PosY++;
   }
 }
@@ -159,26 +273,26 @@ void Milieu()
 void Droite(){
   if (CheckAvant() == 0)
   {
-    avanceY();
+    avance(Y,vitesse);
     PosY++;
   }
   else
   {
-    tourneGauche();
-    avanceX();
+    tourneGauche(939);
+    avance(X,vitesse);
     PosX--;
     if (CheckAvant() == 1)
     {
-      tourneDroit();
-      avanceY();
+      tourneDroit(939);
+      avance(Y,vitesse);
       PosY++;
     }
     else
     {
-      avanceX();
+      avance(X,vitesse);
       PosX--;
-      tourneDroit();
-      avanceY();
+      tourneDroit(939);
+      avance(Y,vitesse);
       PosY++;
     }
   }
@@ -187,33 +301,33 @@ void Droite(){
 
 void retour()
 {
-  tourneDroit();
-  tourneDroit();
-  avanceY();
+  tourneDroit(939);
+  tourneDroit(939);
+  avance(Y,vitesse);
   PosY--;
   while(PosY > 0)
   {
     if (PosRetour[PosY-1]<PosX)
    {
-      tourneDroit();
-      avanceX();
+      tourneDroit(939);
+      avance(X,vitesse);
       if (PosRetour[PosY-1]<PosX)
       {
-       avanceX();
+       avance(X,vitesse);
      }
-     tourneGauche();
+     tourneGauche(939);
    }
    if(PosRetour[PosY-1]>PosX)
    {
-     tourneGauche();
-     avanceX();
+     tourneGauche(939);
+     avance(X,vitesse);
      if (PosRetour[PosY-1]>PosX)
      {
-       avanceX();
+       avance(X,vitesse);
      }
-     tourneDroit();
+     tourneDroit(939);
    }
-   avanceY();
+   avance(Y,vitesse);
    PosY--;
   }
 }
@@ -234,11 +348,10 @@ void retour()
 //initialisation des Pins
 void setup() {
   BoardInit();
+  EncoderInit();
   AX_BuzzerON();
   delay(100);
   AX_BuzzerOFF();
-  MOTOR_SetSpeed(LEFT, 0);
-  MOTOR_SetSpeed(RIGHT, 0);
   pinMode(AvantVertPin, INPUT);
   pinMode(AvantRougePin, INPUT);
   pinMode(GaucheVertPin, INPUT);
@@ -258,6 +371,7 @@ void loop()
   CapteurSon = analogRead(CapteurSonPin);
   Serial.print("CapteurSon");
   Serial.println(CapteurSon);
+
   //Boucle déclarant le départ à partir du sifflet
   if ((CapteurAmbiant + BufferSon) < CapteurSon)
   {
@@ -269,15 +383,23 @@ void loop()
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
   while (PosY<5 && depart)
   {
-    switch (PosX)
+    Serial.print("avance");
+    avance(Y,vitesse);
+    
+  }
+
+}
+   /* switch (PosX)
 
     {
     case 0:
+   
       PosRetour[PosY]=0;
       Gauche();
     break;
 
     case 1: 
+    
      PosRetour[PosY]=1;
      Milieu();
     break;
@@ -289,12 +411,17 @@ void loop()
 
     default:
     break;
+    }
+
+    if (PosY == 5)
+    {
+      fin = true;
+    }
   }
 
-  //Le robot arrête après avoir traversé la ligne de fin
+  while (fin == true)
+  {
+    retour();
   }
-  arret();
-
-  retour();
-
 }
+*/
