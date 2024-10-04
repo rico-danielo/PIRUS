@@ -79,7 +79,9 @@ void Accelerate(float VitesseRecherche)
     static float pourcentageRM= (VitesseRecherche*STARTRATION)/(10);
     float LMSpeed = pourcentageLM*i;
     float RMSpeed = pourcentageRM*i;
-    if(LMSpeed >= 0.15)
+        //A TESTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if(LMSpeed <= 0.15)
     {
     MOTOR_SetSpeed(RIGHT,RMSpeed);
     MOTOR_SetSpeed(LEFT,LMSpeed);
@@ -91,6 +93,7 @@ void Accelerate(float VitesseRecherche)
     }
   }
 }
+
 void DecelerateToAStop(float VitesseRecherche)
 {
   for(int i=10;i>=1;i--)
@@ -124,9 +127,8 @@ Serial.print("avance2");
     int32_t rightPID = ENCODER_Read(RIGHT);
 
     float GoalDist = 95*(3200/WHEELCIRC);//140416 for 45cm
-MOTOR_SetSpeed(LEFT,vitesse);
-MOTOR_SetSpeed(RIGHT,vitesse);
-    //Accelerate(MotorSpeed);
+
+    Accelerate(MotorSpeed);
     
 Serial.print("avance3");
     while(GoalDist > ((leftPID+rightPID)/2) )
