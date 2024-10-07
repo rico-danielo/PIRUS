@@ -2,12 +2,12 @@
 #include <libRobus.h>
 
 //Définition des variables et des constantes
-#define GaucheVertPin 2
-#define GaucheRougePin 3
-#define AvantVertPin 4
-#define AvantRougePin 5
+#define GaucheVertPin 24
+#define GaucheRougePin 26
+#define AvantVertPin 28
+#define AvantRougePin 30
 #define CapteurSonPin (A3)
-#define CapteurAmbiantPin 8
+#define CapteurAmbiantPin (A2)
 #define X 36
 #define Y 80
 
@@ -26,7 +26,7 @@ bool AvantRouge;
 bool depart;
 bool fin = false;
 int BufferSon = 50;
-int PosX = 1;
+int PosX = 0;
 int PosY = 0;
 float CapteurAmbiant;
 float CapteurSon;
@@ -41,24 +41,24 @@ void arret(){
 
 //Fonction permettant une rotation de 90 degrés vers la droite
 void tourneDroit(int time){
-  Serial.print("Tourner 3 tours");
+ // Serial.print("Tourner 3 tours");
   MOTOR_SetSpeed(RIGHT, -0.5*vitesse2);
   MOTOR_SetSpeed(LEFT, 0.5*vitesse2);
   delay(time);
   MOTOR_SetSpeed(RIGHT, 0 );
   MOTOR_SetSpeed(LEFT, 0 );
-  Serial.println("fin des 3 tours");
+  //Serial.println("fin des 3 tours");
 };
 
 void tourneGauche(int time){
-  Serial.print("Tourner 1/2 tours");
+  //Serial.print("Tourner 1/2 tours");
   MOTOR_SetSpeed(RIGHT, 0.5*vitesse2);
   MOTOR_SetSpeed(LEFT, -0.5*vitesse2);
   delay(time);//28560
   
   MOTOR_SetSpeed(RIGHT, 0 );
   MOTOR_SetSpeed(LEFT, 0 );
-  Serial.println("fin des 1/2 tours");
+  //Serial.println("fin des 1/2 tours");
 };
 void ClearEncoders(void){
   ENCODER_Reset(RIGHT);
@@ -112,7 +112,6 @@ void DecelerateToAStop(float VitesseRecherche)
 
     MOTOR_SetSpeed(RIGHT,0);
     MOTOR_SetSpeed(LEFT,0);
-    Serial.println("ARRET");
     ENCODER_Reset(LEFT);
     ENCODER_Reset(RIGHT);
 }
@@ -127,7 +126,6 @@ void avance(int Distance, double MotorSpeed){
     int32_t rightPID = ENCODER_Read(RIGHT);
 
     float GoalDist = Distance*(3200/WHEELCIRC);//140416 for 45cm
-  Serial.println(GoalDist);
     Accelerate(MotorSpeed);
 
     while(GoalDist > ((leftPID+rightPID)/2) )
@@ -136,7 +134,6 @@ void avance(int Distance, double MotorSpeed){
       delay(50);
       leftPID = ENCODER_Read(LEFT);
       rightPID = ENCODER_Read(RIGHT);
-      Serial.println(leftPID);
       if(leftPID > (rightPID+5) || leftPID >(rightPID-5))//Do this comparison first since left motor is slower at the same power percentage
       {
         Rspeed+=((leftPID-rightPID)*0.000008);
@@ -204,6 +201,7 @@ int CheckAvant(){
 //Incrémente automatiquement la position de Y à la fin 
 void Gauche()
 {
+Serial.print("GAUCHE");
 if (CheckAvant() == 0)
   {
       Serial.print("gauche");
@@ -269,6 +267,7 @@ void Milieu()
 //Uniquement pour l'allée
 //Incrémente automatiquement la position de Y à la fin
 void Droite(){
+Serial.print("Droite");
   if (CheckAvant() == 0)
   {
     Serial.print("Droite");
@@ -348,7 +347,6 @@ void setup() {
   AX_BuzzerON();
   delay(100);
   AX_BuzzerOFF();
-  PosY = 0;
   pinMode(AvantVertPin, INPUT);
   pinMode(AvantRougePin, INPUT);
   pinMode(GaucheVertPin, INPUT);
