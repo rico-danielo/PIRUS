@@ -8,8 +8,8 @@
 #define AvantRougePin 5
 #define CapteurSonPin (A3)
 #define CapteurAmbiantPin 8
-#define X 45
-#define Y 95
+#define X 36
+#define Y 80
 
 #define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
 #define ENCODERFULLTURN 3200
@@ -81,7 +81,7 @@ void Accelerate(float VitesseRecherche)
     float RMSpeed = pourcentageRM*i;
         //A TESTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if(LMSpeed <= 0.15)
+    if(LMSpeed >= 0.15)
     {
     MOTOR_SetSpeed(RIGHT,RMSpeed);
     MOTOR_SetSpeed(LEFT,LMSpeed);
@@ -112,13 +112,13 @@ void DecelerateToAStop(float VitesseRecherche)
 
     MOTOR_SetSpeed(RIGHT,0);
     MOTOR_SetSpeed(LEFT,0);
+    Serial.println("ARRET");
     ENCODER_Reset(LEFT);
     ENCODER_Reset(RIGHT);
 }
 
 
 void avance(int Distance, double MotorSpeed){
-Serial.print("avance2");
     ClearEncoders();
   //Read encoder value for both motor (Value readout should be 0)
     float Rspeed = MotorSpeed*STARTRATION;
@@ -126,20 +126,19 @@ Serial.print("avance2");
     int32_t leftPID = ENCODER_Read(LEFT);
     int32_t rightPID = ENCODER_Read(RIGHT);
 
-    float GoalDist = 95*(3200/WHEELCIRC);//140416 for 45cm
-
+    float GoalDist = Distance*(3200/WHEELCIRC);//140416 for 45cm
+  Serial.println(GoalDist);
     Accelerate(MotorSpeed);
-    
-Serial.print("avance3");
+
     while(GoalDist > ((leftPID+rightPID)/2) )
     {
       //i++;  //Pour voir les valeurs lue des encodeurs à chaque changement.
       delay(50);
       leftPID = ENCODER_Read(LEFT);
       rightPID = ENCODER_Read(RIGHT);
+      Serial.println(leftPID);
       if(leftPID > (rightPID+5) || leftPID >(rightPID-5))//Do this comparison first since left motor is slower at the same power percentage
       {
-        Serial.print("avance31");
         Rspeed+=((leftPID-rightPID)*0.000008);
         Lspeed-=((leftPID-rightPID)*0.000004);
         MOTOR_SetSpeed(RIGHT,Rspeed);
@@ -148,7 +147,6 @@ Serial.print("avance3");
       }
       else if(leftPID < rightPID+5 || leftPID < (rightPID-5))
       {
-        Serial.print("avance32");
         Lspeed+=((rightPID-leftPID)*0.000008);   
         Rspeed-=((rightPID-leftPID)*0.000004);
         MOTOR_SetSpeed(LEFT,Lspeed);
@@ -157,7 +155,6 @@ Serial.print("avance3");
       }
       else if((leftPID && rightPID) == 0)
       {
-        Serial.print("avance33");
         MOTOR_SetSpeed(RIGHT,Rspeed);
         MOTOR_SetSpeed(LEFT,Lspeed);
         
@@ -168,7 +165,6 @@ Serial.print("avance3");
       SpeedLArray[i] = Rspeed;
       SpeedRArray[i] = Lspeed;*/
     }
-Serial.print("avance4");
     DecelerateToAStop(MotorSpeed);
     leftPID = ENCODER_Read(LEFT);
     rightPID = ENCODER_Read(RIGHT);
@@ -182,11 +178,11 @@ Serial.print("avance4");
 int CheckGauche(){
   GaucheRouge = digitalRead(GaucheRougePin);
   GaucheVert = digitalRead(GaucheVertPin); 
-  if (GaucheVert && GaucheRouge)
+  if (!GaucheVert || !GaucheRouge)
   {
-   return 0;
+    return 1;
   }
-  return 1;
+  return 0;
 }
 
 //Fonction permettant de lire les capteurs droite
@@ -195,11 +191,11 @@ int CheckGauche(){
 int CheckAvant(){
   AvantRouge = digitalRead(AvantRougePin);
   AvantVert = digitalRead(AvantVertPin);
-  if (AvantRouge && AvantVert)
+  if (!AvantRouge || !AvantVert)
   {
-    return 0;
+    return 1;
   }
-  return 1;
+  return 0;
 }
 
 
@@ -210,29 +206,27 @@ void Gauche()
 {
 if (CheckAvant() == 0)
   {
-    avance(Y,vitesse);
-      PosY++;
+      Serial.print("gauche");
   }
 else
   {
     tourneDroit(939);
     avance(X,vitesse);
     PosX++;
-    if (CheckGauche == 0)
+    if (CheckGauche() == 0)
     {
-      tourneGauche(939);
-      avance(Y,vitesse);
-      PosY++;
+      Serial.print("Milieu");
     }
     else
     {
+      Serial.print("Droite");
       avance(X,vitesse);
       PosX++;
-      tourneGauche(939);
-      avance(Y,vitesse);
-      PosY++;
     }
+    tourneGauche(939);
   }
+  avance(Y,vitesse);
+  PosY++;
 }
 
 
@@ -242,29 +236,31 @@ else
 //Incrémente automatiquement la position de Y à la fin
 void Milieu()
 {
+  Serial.print("Milieu");
   if (CheckAvant() == 0)
   {
-    avance(Y,vitesse);
-    PosY++;
+    Serial.print("avance");
   }
-  else
-  {
-    if (CheckGauche() == 0)
+  else if (CheckGauche() == 0)
     {
+      Serial.print("gauche");
       tourneGauche(939);
       avance(X,vitesse);
       PosX--;
       tourneDroit(939);
-      avance(Y,vitesse);
-      PosY++;
+
     }
-    tourneDroit(939);
-    avance(X,vitesse);
-    PosX++;
-    tourneGauche(939);
+    else
+    {
+      Serial.print("droite");
+      tourneDroit(939);
+      avance(X,vitesse);
+      PosX++;
+      tourneGauche(939);
+
+    }
     avance(Y,vitesse);
     PosY++;
-  }
 }
 
 
@@ -275,8 +271,7 @@ void Milieu()
 void Droite(){
   if (CheckAvant() == 0)
   {
-    avance(Y,vitesse);
-    PosY++;
+    Serial.print("Droite");
   }
   else
   {
@@ -285,19 +280,18 @@ void Droite(){
     PosX--;
     if (CheckAvant() == 1)
     {
-      tourneDroit(939);
-      avance(Y,vitesse);
-      PosY++;
+        Serial.print("Milieu");
     }
     else
     {
+        Serial.print("Gauche");
       avance(X,vitesse);
       PosX--;
-      tourneDroit(939);
-      avance(Y,vitesse);
-      PosY++;
     }
+    tourneDroit(939);
   }
+  avance(Y,vitesse);
+  PosY++;
 }
 
 
@@ -377,14 +371,14 @@ void loop()
   Serial.println(CapteurSon);
   
   //Boucle déclarant le départ à partir du sifflet
-/*  if ((CapteurAmbiant + BufferSon) < CapteurSon)
+  if ((CapteurAmbiant + BufferSon) < CapteurSon)
   {
    depart = true;
    Serial.println("true");
   }
-*/
 
-depart = true;
+
+
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
   while (PosY<5 && depart)
   {
