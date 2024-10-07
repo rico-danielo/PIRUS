@@ -354,6 +354,7 @@ void setup() {
   AX_BuzzerON();
   delay(100);
   AX_BuzzerOFF();
+  PosY = 0;
   pinMode(AvantVertPin, INPUT);
   pinMode(AvantRougePin, INPUT);
   pinMode(GaucheVertPin, INPUT);
@@ -370,27 +371,23 @@ void loop()
   CapteurAmbiant = analogRead(CapteurAmbiantPin);
   Serial.print("Ambiant");
   Serial.println(CapteurAmbiant);
-  
+
   CapteurSon = analogRead(CapteurSonPin);
   Serial.print("CapteurSon");
   Serial.println(CapteurSon);
   
   //Boucle déclarant le départ à partir du sifflet
-  if ((CapteurAmbiant + BufferSon) < CapteurSon)
+/*  if ((CapteurAmbiant + BufferSon) < CapteurSon)
   {
    depart = true;
    Serial.println("true");
   }
+*/
 
-
-
+depart = true;
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
   while (PosY<5 && depart)
   {
-    Serial.print("avance");
-    avance(Y,vitesse);
-
-
     switch (PosX)
 
     {
