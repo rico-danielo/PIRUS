@@ -361,43 +361,37 @@ void setup() {
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
   
-  CapteurAmbiant = analogRead(CapteurAmbiantPin);
-  Serial.print("Ambiant");
-  Serial.println(CapteurAmbiant);
-  delay(500);
-
-
-  CapteurSon = analogRead(CapteurSonPin);
-  Serial.print("CapteurSon");
-  Serial.println(CapteurSon);
-  delay(500);
+  
 }
 
 
 void loop()
 {
-
-avance(Y,vitese);
-}
+  CapteurAmbiant = analogRead(CapteurAmbiantPin);
+  Serial.print("Ambiant");
+  Serial.println(CapteurAmbiant);
+  
+  CapteurSon = analogRead(CapteurSonPin);
+  Serial.print("CapteurSon");
+  Serial.println(CapteurSon);
+  
   //Boucle déclarant le départ à partir du sifflet
- /* if ((CapteurAmbiant + BufferSon) < CapteurSon)
+  if ((CapteurAmbiant + BufferSon) < CapteurSon)
   {
    depart = true;
    Serial.println("true");
   }
-*/ 
+
 
 
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
-  /*while (PosY<5 && depart)
+  while (PosY<5 && depart)
   {
     Serial.print("avance");
     avance(Y,vitesse);
 
-  }
 
-}*/
-   /* switch (PosX)
+    switch (PosX)
 
     {
     case 0:
@@ -432,4 +426,3 @@ avance(Y,vitese);
     retour();
   }
 }
-*/
