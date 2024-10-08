@@ -10,8 +10,8 @@
 #define CapteurAmbiantPin (A2)
 #define X 36
 #define Y 80
-#define DEGD 900 //974 A
-#define DEGL 938
+#define DEGD 942 //974 A     900 B 
+#define DEGL 942//          938 B
 #define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
 #define ENCODERFULLTURN 3200
 #define STARTRATION 1.037
@@ -218,6 +218,16 @@ else
         avance(Y,vitesse);
         PosY++;
       }
+      else
+      {
+        tourneDroit(DEGD);
+        avance(X,vitesse);
+        PosX++;
+        tourneGauche(DEGL);
+        avance(Y,vitesse);
+        PosY++;
+      }
+
     }
     else
     {
@@ -230,7 +240,7 @@ else
         {
         avance(Y,vitesse);
         PosY++;
-        }
+        }        
       }
       else
       {
@@ -267,7 +277,6 @@ void Milieu()
       }
       else
       {
-  
         tourneDroit(DEGD);
       }
     }
