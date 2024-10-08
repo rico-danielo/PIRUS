@@ -367,7 +367,7 @@ void setup() {
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
   Serial.print("debut");
-    tourneGauche(974);//19500
+    tourneDroit(974);//19500
 }
 
 
