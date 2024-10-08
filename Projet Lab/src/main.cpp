@@ -295,7 +295,7 @@ Serial.print("Droite");
 }
 
 //Fonction permettant le retour
-//Cette fonction n'a pas été vérifier à date
+/*Cette fonction n'a pas été vérifier à date
 void retour()
 {
   tourneDroit(939);
@@ -328,7 +328,7 @@ void retour()
    PosY--;
   }
 }
-
+*/
 
 
 
@@ -379,7 +379,7 @@ void loop()
 
 
   //Boucle déclarant chaque cas possible selon la position du robot pour l'allée
-  while (PosY<5 && depart)
+  while (PosY<5 && depart && !fin)
   {
     switch (PosX)
 
@@ -413,7 +413,37 @@ void loop()
 
 //initialisation du retour
   while (fin == true)
-  {
+  { for(PosY>0)
+    {
+      avance(Y, vitesse);
+      PosY--;
+      if PosRetour[PosY] < PosRetour[PosY-1]
+      {
+        tourneGauche(939);
+        while PosRetour[PosY] != PosX
+        {
+          avance(X, vitesse);
+          X++;
+        }
+        tourneDroit(939);
+      }
+      if PosRetour[PosY] > PosRetour[PosY-1]
+      {
+        tourneDroit(939);
+        while PosRetour[PosY] != PosX
+        {
+          avance(X, vitesse);
+          X--;
+        }
+        tourneGauche(939);
+      }
+      if PosRetour[PosY] == PosRetour[PosY-1]
+      {
+        avance(Y, vitesse);
+        PosY--;
+      }
+    }
+    
     retour();
   }
   */
