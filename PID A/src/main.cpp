@@ -13,7 +13,7 @@
 
 #define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
 #define ENCODERFULLTURN 3200
-#define STARTRATION 1.0325
+#define STARTRATION 1.037
 int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
 int etatPast = 0;
 float vitesse = 0.40;
@@ -130,17 +130,15 @@ void avance(int Distance, double MotorSpeed){
     int32_t rightPID = ENCODER_Read(RIGHT);
 
     float GoalDist = Distance*(3200/WHEELCIRC);//140416 for 45cm
-    Serial.print("Goal Dist: ");
-    Serial.println(GoalDist);
     Accelerate(MotorSpeed);
 
     while(GoalDist > ((leftPID+rightPID)/2) )
     {
       //i++;  //Pour voir les valeurs lue des encodeurs à chaque changement.
-      delay(50);
+      delay(100);
       leftPID = ENCODER_Read(LEFT);
       rightPID = ENCODER_Read(RIGHT);
-      if(leftPID > (rightPID+5) || leftPID >(rightPID-5))//Do this comparison first since left motor is slower at the same power percentage
+      if(leftPID >(rightPID-15))//Do this comparison first since left motor is slower at the same power percentage
       {
         Rspeed+=((leftPID-rightPID)*0.000008);
         Lspeed-=((leftPID-rightPID)*0.000004);
@@ -148,7 +146,7 @@ void avance(int Distance, double MotorSpeed){
         MOTOR_SetSpeed(LEFT,Lspeed);
         
       }
-      else if(leftPID < rightPID+5 || leftPID < (rightPID-5))
+      else if(leftPID < (rightPID+15))
       {
         Lspeed+=((rightPID-leftPID)*0.000008);   
         Rspeed-=((rightPID-leftPID)*0.000004);
@@ -156,17 +154,15 @@ void avance(int Distance, double MotorSpeed){
         MOTOR_SetSpeed(RIGHT,Rspeed);
         
       }
-      else if((leftPID && rightPID) == 0)
+     /* else if((leftPID && rightPID) == 0)
       {
         MOTOR_SetSpeed(RIGHT,Rspeed);
         MOTOR_SetSpeed(LEFT,Lspeed);
         
-      }
+      }*/
     }
     DecelerateToAStop(MotorSpeed);
-    leftPID = ENCODER_Read(LEFT);
-    rightPID = ENCODER_Read(RIGHT);
-    delay(500);
+
 }
 
 
@@ -329,7 +325,24 @@ void retour()
   }
 }
 
-
+void TestAvance(int time, float vitesse)
+{
+  ClearEncoders();
+  MOTOR_SetSpeed(RIGHT,vitesse*STARTRATION);
+  MOTOR_SetSpeed(LEFT, vitesse);
+  delay(time);
+  MOTOR_SetSpeed(RIGHT,0);
+  MOTOR_SetSpeed(LEFT, 0);
+    long leftPID = ENCODER_Read(LEFT);
+    long rightPID = ENCODER_Read(RIGHT);
+    Serial.print("Left: ");
+    Serial.print(leftPID);
+    Serial.print("Right: ");
+    Serial.print(rightPID);
+    Serial.print("ratio: ");
+    float ratio = 1000 * (leftPID / rightPID);
+    Serial.print(ratio);
+}
 
 
 
@@ -353,13 +366,13 @@ void setup() {
   pinMode(GaucheRougePin, INPUT);
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
-  avance(1000,vitesse);
+  Serial.print("debut");
+    tourneGauche(974);//19500
 }
 
 
 void loop()
 {
-
   //Loop permettant l'observation des capteurs de son jusqu'au départ du sifflet
  /* CapteurAmbiant = analogRead(CapteurAmbiantPin);
   Serial.print("Ambiant");
@@ -416,5 +429,5 @@ void loop()
   {
     retour();
   }
-  */
+*/
 }
