@@ -39,36 +39,43 @@ void arret(){
 };
 
 
-//Fonction permettant une rotation de 90 degrés vers la droite
+//Fonction permettant une rotation vers la droite
 void tourneDroit(int time){
- // Serial.print("Tourner 3 tours");
+
   MOTOR_SetSpeed(RIGHT, -0.5*vitesse2);
   MOTOR_SetSpeed(LEFT, 0.5*vitesse2);
   delay(time);
   MOTOR_SetSpeed(RIGHT, 0 );
   MOTOR_SetSpeed(LEFT, 0 );
-  //Serial.println("fin des 3 tours");
+  delay(50);
 };
 
+//Fonction permettant de tourner à gauche
 void tourneGauche(int time){
-  //Serial.print("Tourner 1/2 tours");
+
   MOTOR_SetSpeed(RIGHT, 0.5*vitesse2);
   MOTOR_SetSpeed(LEFT, -0.5*vitesse2);
   delay(time);//28560
-  
+
   MOTOR_SetSpeed(RIGHT, 0 );
   MOTOR_SetSpeed(LEFT, 0 );
-  //Serial.println("fin des 1/2 tours");
+  delay(50);
 };
+
+//Clear les encoders
 void ClearEncoders(void){
   ENCODER_Reset(RIGHT);
   ENCODER_Reset(LEFT);
 };
 
+
+//Initialiser les encoders
 void EncoderInit(void){
   ClearEncoders();
 };
 
+
+//Fonction permettant l'accélération du robot jusqu'à une certaine vitesse
 void Accelerate(float VitesseRecherche)
 {
   int i = 1;
@@ -79,21 +86,17 @@ void Accelerate(float VitesseRecherche)
     static float pourcentageRM= (VitesseRecherche*STARTRATION)/(10);
     float LMSpeed = pourcentageLM*i;
     float RMSpeed = pourcentageRM*i;
-        //A TESTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if(LMSpeed >= 0.15)
     {
     MOTOR_SetSpeed(RIGHT,RMSpeed);
     MOTOR_SetSpeed(LEFT,LMSpeed);
-    /*int32_t leftPID = ENCODER_Read(LEFT);
-    int32_t rightPID = ENCODER_Read(RIGHT);
-    PidLArray[i] = leftPID;
-    PidRArray[i] = rightPID;*/
     delay(100);
     }
   }
 }
 
+
+//permet l'arret du robot
 void DecelerateToAStop(float VitesseRecherche)
 {
   for(int i=10;i>=1;i--)
@@ -117,6 +120,7 @@ void DecelerateToAStop(float VitesseRecherche)
 }
 
 
+//Fonction permettant de faire avancer le robot
 void avance(int Distance, double MotorSpeed){
     ClearEncoders();
   //Read encoder value for both motor (Value readout should be 0)
@@ -156,11 +160,6 @@ void avance(int Distance, double MotorSpeed){
         MOTOR_SetSpeed(LEFT,Lspeed);
         
       }
-
-      /*PidLArray[i] = leftPID;//Pour voir les valeurs lue des encodeurs à chaque changement.
-      PidRArray[i] = rightPID;
-      SpeedLArray[i] = Rspeed;
-      SpeedRArray[i] = Lspeed;*/
     }
     DecelerateToAStop(MotorSpeed);
     leftPID = ENCODER_Read(LEFT);
@@ -293,7 +292,8 @@ Serial.print("Droite");
   PosY++;
 }
 
-
+//Fonction permettant le retour
+//Cette fonction n'a pas été vérifier à date
 void retour()
 {
   tourneDroit(939);
@@ -353,13 +353,13 @@ void setup() {
   pinMode(GaucheRougePin, INPUT);
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
-  
-  
+
 }
 
 
 void loop()
 {
+  //Loop permettant l'observation des capteurs de son jusqu'au départ du sifflet
   CapteurAmbiant = analogRead(CapteurAmbiantPin);
   Serial.print("Ambiant");
   Serial.println(CapteurAmbiant);
@@ -410,6 +410,7 @@ void loop()
     }
   }
 
+//initialisation du retour
   while (fin == true)
   {
     retour();
