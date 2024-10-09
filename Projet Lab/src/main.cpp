@@ -2,18 +2,17 @@
 #include <libRobus.h>
 
 //Définition des variables et des constantes
-#define GaucheVertPin 24
-#define GaucheRougePin 26
-#define AvantVertPin 28
-#define AvantRougePin 30
+#define GaucheVertPin 22
+#define GaucheRougePin 24
+#define AvantVertPin 26
+#define AvantRougePin 28
 #define CapteurSonPin (A3)
 #define CapteurAmbiantPin (A2)
 #define X 36
 #define Y 80
-#define DEGD 942 //974 A     900 B 
-#define DEGL 942//          938 B
+#define DEGD 900 //974 A     900 B 
+#define DEGL 938//          938 B
 #define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
-#define ENCODERFULLTURN 3200
 #define STARTRATION 1.037
 
 int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
@@ -174,7 +173,7 @@ void avance(int Distance, double MotorSpeed){
 int CheckGauche(){
   GaucheRouge = digitalRead(GaucheRougePin);
   GaucheVert = digitalRead(GaucheVertPin); 
-  if (!GaucheVert && !GaucheRouge)
+  if (!GaucheVert || !GaucheRouge)
   {
     return 1;
   }
@@ -187,7 +186,7 @@ int CheckGauche(){
 int CheckAvant(){
   AvantRouge = digitalRead(AvantRougePin);
   AvantVert = digitalRead(AvantVertPin);
-  if (!AvantRouge && !AvantVert)
+  if (!AvantRouge || !AvantVert)
   {
     return 1;
   }
