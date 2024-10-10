@@ -8,15 +8,25 @@
 #define AvantRougePin 28
 #define CapteurSonPin (A3)
 #define CapteurAmbiantPin (A2)
-#define X 36
-#define Y 80
-#define DEGD 974 //974 A     900 B 
-#define DEGL 974//          938 B
 #define WHEELCIRC 23.938936 //Wheel circumference rounded up to 4 decimals
-#define STARTRATION 1.037
 
-int etat = 0; // = 0 arrêt 1 = avance 2 = recule 3 = TourneDroit 4 = TourneGauche
-int etatPast = 0;
+#if 1// robot A
+  #define STARTRATION 1.037
+  #define DEGD 958 //974 A     900 B 
+  #define DEGL 953//          938 B
+  #define X 36
+  #define Y 78
+ 
+#else //ROBOT B
+  #define STARTRATION 1.0965
+  #define DEGD 895 //974 A     900 B 
+  #define DEGL 938//          938 B
+  #define X 31
+  #define Y 78.5
+  
+#endif
+
+
 float vitesse = 0.40;
 bool GaucheVert;
 bool GaucheRouge;
@@ -307,74 +317,68 @@ void Droite()
 {
   if (CheckAvant() == 0)
   {
+    Serial.println("#1 : Rien en avant ^");
     avance(Y,vitesse);
     PosY++;
   }
   else
   {
+    Serial.println("#1 : Objet en avant ^");
     if (CheckGauche() == 0)
     {
+      Serial.println("#2 : CheckGauche n'a rien vu, tourne à gauche, avance x <-");
       tourneGauche(DEGL);
       avance(X,vitesse);
       PosX--;
       if (CheckAvant() == 1)
       {
+        Serial.println("#2 : Objet en avant, tourne à droite ^, avance Y");
         tourneDroit(DEGD);
+        delay(200);
         if(CheckAvant() == 0)
         {
+          Serial.println("#3 : CheckAvant n'a rien vu , avance Y");
           avance(Y,vitesse);
           PosY++;
         }
+        else
+        {
+          Serial.println("#3 : CheckAvant a vu un oobstacle , tourne gauche, avance X, tourne droit, avance Y");
+          tourneGauche(DEGL);
+          avance(X,vitesse);
+          PosX--;
+          tourneDroit(DEGD);
+          avance(Y,vitesse);
+          PosY++;
+        }
+
       }
       else
       {
-        avance(X,vitesse);
-        PosX--;
-        avance(Y,vitesse);
-        PosY++;
+        Serial.println("#4 : Rien en avant, tourne à droite ^");
+        tourneDroit(DEGD);
+        if(CheckAvant() == 0)
+        {
+          Serial.println("#4 : Rien en avant, avance Y <");
+          avance(Y,vitesse);
+          PosY++;
+        }
+        else
+        {
+          Serial.println("#4 : Objet en avant ^, tourne à gauche <, avance x , tourne droit ^, avance y");
+          tourneGauche(DEGL);
+          avance(X,vitesse);
+          PosX--;
+          tourneDroit(DEGD);
+          avance(Y,vitesse);
+          PosY++;
+        }
+
       }
     }
-
   }
 }
 
-
-
-
-void retour()
-{
-tourneDroit(2*DEGD);
-  for(;PosY>0;PosY--)
-    {
-      avance(Y, vitesse);
-      PosY--;
-      if (PosRetour[PosY] < PosRetour[PosY-1])
-      {
-        tourneGauche(DEGL);
-        while (PosRetour[PosY] != PosX)
-        {
-          avance(X, vitesse);
-          PosX++;
-        }
-        tourneDroit(DEGD);
-      }
-      if (PosRetour[PosY] > PosRetour[PosY-1])
-      {
-        tourneDroit(DEGD);
-        while (PosRetour[PosY] != PosX)
-        {
-          avance(X, vitesse);
-          PosX--;
-        }
-        tourneGauche(DEGL);
-      }
-      if (PosRetour[PosY] == PosRetour[PosY-1])
-      {
-        avance(Y, vitesse);
-      }
-    }
-    
-}
 
 
 void Middle()
@@ -422,7 +426,14 @@ void setup() {
   pinMode(GaucheVertPin, INPUT);
   pinMode(GaucheRougePin, INPUT);
   pinMode(CapteurAmbiantPin, INPUT);
-  pinMode(CapteurSonPin, INPUT);
+  pinMode(CapteurSonPin, INPUT); 
+  for(int i = 0; i<10; i++)
+  {
+    tourneDroit(DEGD);
+    delay(100);
+    tourneGauche(DEGL);
+    delay(100);
+  }
 }
 
 
@@ -452,7 +463,13 @@ void loop()
 //initialisation du retour
   while (fin == true)
   { 
-    retour();
+      tourneDroit(2*DEGD);
+    PosX = 2 - PosX;
+    PosY = 0;
+    while(PosY < 5)
+    {
+      Middle();
+    }
   }
   
 }

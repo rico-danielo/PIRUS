@@ -361,23 +361,14 @@ void setup() {
   pinMode(CapteurAmbiantPin, INPUT);
   pinMode(CapteurSonPin, INPUT);
   
-  CapteurAmbiant = analogRead(CapteurAmbiantPin);
-  Serial.print("Ambiant");
-  Serial.println(CapteurAmbiant);
-  delay(500);
 
-
-  CapteurSon = analogRead(CapteurSonPin);
-  Serial.print("CapteurSon");
-  Serial.println(CapteurSon);
-  delay(500);
 }
 
 
 void loop()
 {
-
-avance(Y,vitese);
+tourneDroit(30000)
+tourneDroit(8000);
 }
   //Boucle déclarant le départ à partir du sifflet
  /* if ((CapteurAmbiant + BufferSon) < CapteurSon)
