@@ -7,52 +7,61 @@ int detecteur_de_ligne == (0);
 int Initilisation (couleur){
   if (couleur == "rouge"){
     while (detecteur_de_ligne == (0)){
-    avance(vitesse);
+    MOTOR_SetSpeed(RIGHT,(0.3));
+    MOTOR_SetSpeed(LEFT,(O.3));
     }
+    while (couleur != "noir" && detecteur_de_ligne == (1)){
+      MOTOR_SetSpeed(RIGHT,(0.5));
+      MOTOR_SetSpeed(LEFT,(O.5));
+    }
+    tourneDroit(DEGD);
+    while (couleur != "jaune" && detecteur_de_ligne == (1)){
+      MOTOR_SetSpeed(RIGHT,(0.5));
+      MOTOR_SetSpeed(LEFT,(O.5));
+    }
+    tourneDroit(2*DEGD);
   }
   if (couleur == "jaune"){
-    while(detecteur_de_ligne == (1)){
-      avance (vitesse);
-    }
-    while (couleur != "noir"){
-      detecteur_de_ligne = (1);
-      avance(vitesse);
-    }
-      tourneGauche ();
-    while (couleur != "rouge"){
-      detecteur_de_ligne == (1);
-      avance(vitesse);
-    }
-    tourneGauche;
-    tourneGauche;
+    while(detecteur_de_ligne ==(0)){
+      MOTOR_SetSpeed(RIGHT,(0.3));
+      MOTOR_SetSpeed(LEFT,(O.3));
+    }    
   }
   if (couleur == "vert"){
-    while(detecteur_de_ligne == (1)){
-      avance (vitesse);
+ while (detecteur_de_ligne == (0)){
+      MOTOR_SetSpeed(RIGHT,(0.3));
+      MOTOR_SetSpeed(LEFT,(O.3));
     }
-    while (couleur != "noir"){
-      detecteur_de_ligne = (1);
-      avance(vitesse);
+    while (couleur != "noir" && detecteur_de_ligne == (1)){
+     MOTOR_SetSpeed(RIGHT,(0.5));
+     MOTOR_SetSpeed(LEFT,(O.5));
     }
-      tourneDroit ();
-    while (couleur != "rouge"){
-      detecteur_de_ligne == (1);
-      avance(vitesse);
+    while (detecteur_de_ligne == (0)){
+      MOTOR_SetSpeed(RIGHT,(0.3));
+      MOTOR_SetSpeed(LEFT,(O.3));
     }
-    tourneGauche;
-    tourneGauche;
+     while (couleur != "jaune" && detecteur_de_ligne == (1)){
+      MOTOR_SetSpeed(RIGHT,(0.5));
+      MOTOR_SetSpeed(LEFT,(O.5));
+    }
+    tourneDroit(2*DEGD);    
+  }
   }
   if (couleur == "bleu"){
-    while (detecteur_de_ligne == (0)){
-      avance(vitesse);
+   while (detecteur_de_ligne == (0)){
+    MOTOR_SetSpeed(RIGHT,(0.3));
+    MOTOR_SetSpeed(LEFT,(O.3));
     }
-    while (couleur != "rouge"){
-      detecteur_de_ligne == (1);
-      avance(vitesse)
+    while (couleur != "noir" && detecteur_de_ligne == (1)){
+      MOTOR_SetSpeed(RIGHT,(0.5));
+      MOTOR_SetSpeed(LEFT,(O.5));
     }
-    tourneGauche;
-    tourneGauche;
-  }
+    tourneGauche(DEGL);
+    while (couleur != "jaune" && detecteur_de_ligne == (1)){
+      MOTOR_SetSpeed(RIGHT,(0.5));
+      MOTOR_SetSpeed(LEFT,(O.5));
+    }
+    tourneDroit(2*DEGD);
 
 }
 
