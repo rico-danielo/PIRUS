@@ -1,3 +1,4 @@
+#include <LibRobus.h>
 #include <Arduino.h>
 
 // put function declarations here:
@@ -23,8 +24,8 @@ int Initilisation (couleur){
       detecteur_de_ligne == (1);
       avance(vitesse);
     }
-    tourneGauche;
-    tourneGauche;
+    tourneGauche();
+    tourneGauche();
   }
   if (couleur == "vert"){
     while(detecteur_de_ligne == (1)){
@@ -39,8 +40,8 @@ int Initilisation (couleur){
       detecteur_de_ligne == (1);
       avance(vitesse);
     }
-    tourneGauche;
-    tourneGauche;
+    tourneGauche();
+    tourneGauche();
   }
   if (couleur == "bleu"){
     while (detecteur_de_ligne == (0)){
@@ -50,10 +51,32 @@ int Initilisation (couleur){
       detecteur_de_ligne == (1);
       avance(vitesse)
     }
-    tourneGauche;
-    tourneGauche;
+    tourneGauche();
+    tourneGauche();
   }
 
+}
+
+#define LignePin 30 //pas oublié de mettre dans la fonction setup
+void SuiveurLigne()
+{
+  float SortieLigne = analogRead(30) * (5.0 / 1023.0);
+  MOTOR_SetSpeed(LEFT, 0.5);
+  MOTOR_SetSpeed(RIGHT, 0.5);
+  if(SortieLigne >= 3.80 && SortieLigne <= 4.10)
+  {
+    while(SortieLigne >= 3.80)
+    {
+      MOTOR_SetSpeed(LEFT, 0.49);
+    }
+  }
+  else if(SortieLigne >= 1.80 && SortieLigne <= 2.20)
+  {
+    while(SortieLigne >= 1.80)
+    {
+      MOTOR_SetSpeed(RIGHT, 0.49);
+    }
+  }
 }
 
 void setup() {
