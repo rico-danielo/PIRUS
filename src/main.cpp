@@ -186,41 +186,142 @@ int deposerButCoter(){
 
 int deposerButFace(){
   avance(X,vitesse);
+  //MOTOR_SetSpeed(LEFT, 0.3);
+  //MOTOR_SetSpeed(RIGHT,0.3);
   arret();
   // fonction deposer l'objet
   couleurRechercher++;
   tourneDroit(2*DEGD);
-  //fonction initialisation
   return couleurRechercher;
 }
 
+void trouverLigne(){
+    do{
+        int i = 1;
+        if(i <= 10){
+            MOTOR_SetSpeed(LEFT, 0.1*i);
+            MOTOR_SetSpeed(RIGHT,0.1*i);
+            delay(50);
+        }
+    }while(capteurLigne);
+    arret();
+    tourneDroit(DEGD);
+}
+
+
+
 // Fonction permettant de retourner l'objet dans le but correspondant:
 void retourObjet() {
-    avance(X,vitesse);
-    if(capteurLigne){
-      tourneGauche(DEGL);
-      // fonction pour suivre la ligne
-      if(capteurCouleur() == couleur){
-          // couleur == couleurRechercher
-          deposerButCoter();
-      }else if(capteurCouleur() == couleur){
-          // couleur == vert
-          tourneGauche(DEGL);
-          // fonction pour suivre la ligne
-          if(capteurCouleur() == couleur){
-            // couleur == couleurRechercher
-            deposerButCoter();
-          }  
-      }else{
-        tourneGauche(2*DEGL);
-        // fonction pour suivre la ligne
-        if(capteurCouleur() == couleur){
-            // couleur == couleurRechercher
+    switch (couleurRechercher)
+    {
+    case 1:
+      //fonction initialisation
+      //fonction rechercher objet
+      if(capteurLigne()){
+        //fonction suivre ligne
+        if(capteurCouleur() == couleurRechercher){
             deposerButFace();
-          } 
+        }else{
+          tourneDroit(DEGD);
+          //fonction suivre ligne
+          deposerButCoter();
+        } 
+      }else{
+          trouverLigne();
+           // fonction pour suivre la ligne
+           deposerButCoter();
       }
+      
+      do {
+          //fonction suivre la ligne
+      }while(capteurCouleur()); //capteurCouleur()  == bleu
+      tourneDroit(2*DEGD);
+      break;
+    
+    case 2:
+      //fonction rechercher objet
+       if(capteurLigne()){
+        //fonction suivre ligne
+        if(capteurCouleur() == couleurRechercher){
+            deposerButFace();
+        }else{
+          tourneDroit(DEGD);
+          //fonction suivre ligne
+          deposerButCoter();
+        } 
+      }else{
+          trouverLigne();
+           // fonction pour suivre la ligne
+           deposerButCoter();
+      }
+
+      do {
+          //fonction suivre la ligne
+      }while(capteurCouleur()); //capteurCouleur()  == noir
+      arret();
+      break;
+
+    case 3:
+      //fonction rechercher objet
+       if(capteurLigne()){
+        //fonction suivre ligne
+        if(capteurCouleur() == couleurRechercher){
+            deposerButFace();
+        }else{
+          tourneDroit(DEGD);
+          //fonction suivre ligne
+          deposerButCoter();
+        } 
+      }else{
+          trouverLigne();
+           // fonction pour suivre la ligne
+           deposerButCoter();
+      }
+
+      break;
+
+    case 4:
+      //fonction rechercher objet
+       if(capteurLigne()){
+        //fonction suivre ligne
+        if(capteurCouleur() == couleurRechercher){
+            deposerButFace();
+        }else{
+          tourneDroit(DEGD);
+          //fonction suivre ligne
+          deposerButCoter();
+        } 
+      }else{
+          trouverLigne();
+           // fonction pour suivre la ligne
+           deposerButCoter();
+      }
+      arret();
+      break;
+    
+    default:
+      break;
     }
-}
+    // if(capteurCouleur() == couleur){
+    //     // couleur == couleurRechercher
+    //     deposerButCoter();
+    // }else if(capteurCouleur() == couleur){
+    //     // couleur == autre couleur 
+    //     tourneGauche(DEGL);
+    //     // fonction pour suivre la ligne
+    //     if(capteurCouleur() == couleur){
+    //       // couleur == couleurRechercher
+    //       deposerButCoter();
+    //     }  
+    // }else{
+    //   tourneGauche(2*DEGL);
+    //   // fonction pour suivre la ligne
+    //   if(capteurCouleur() == couleur){
+    //       // couleur == couleurRechercher
+    //       deposerButFace();
+    //     } 
+    // }
+  }
 
 void setup() {
   retourObjet();
